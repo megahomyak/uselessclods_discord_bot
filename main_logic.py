@@ -31,6 +31,8 @@ class Bot:
                     second=0,
                     microsecond=0
                 )
+                if now > future:
+                    continue
                 await asyncio.sleep((future - now).total_seconds())
                 await self.mentions_channel.send(self.config.scheduled_message)
 
@@ -38,9 +40,9 @@ class Bot:
         self.mentions_channel = self.discord_client.get_channel(
             self.config.scheduled_messages_channel_id
         )
+        asyncio.create_task(self.send_scheduled_message_periodically())
 
     async def start(self):
-        asyncio.create_task(self.send_scheduled_message_periodically())
         self.discord_client.on_ready = self.set_scheduled_messages
         print("Starting!")
         await self.discord_client.start(self.config.discord_bot_token)
